@@ -42,7 +42,7 @@ internals.Traceroute.trace = function (host, callback) {
         traceroute.stdout.on('data', (data) => {
 
             ++counter;
-            if ((!internals.isWin && counter < 2) || (internals.isWin && counter < 5)) {
+            if ((!internals.isWin && counter < 1) || (internals.isWin && counter < 5)) {
                 return null;
             }
 
