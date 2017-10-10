@@ -18,10 +18,14 @@ internals.isWin = /^win/.test(Os.platform());
 module.exports = internals.Traceroute = {};
 
 
-internals.Traceroute.trace = function (host, callback) {
+internals.Traceroute.trace = function (host, options, callback) {
 
+    let options_default = {
+        maxhops: undefined
+    }
+    options = options || {};
+    options = Object.assign(options_default, options);
     const Emitter = function () {
-
         EventEmitter.call(this);
     };
     Util.inherits(Emitter, EventEmitter);
@@ -34,7 +38,13 @@ internals.Traceroute.trace = function (host, callback) {
         }
 
         const command = (internals.isWin ? 'tracert' : 'traceroute');
-        const args = internals.isWin ? ['-d', host] : ['-q', 1, '-n', host];
+        let args;
+        if (options.maxhops === undefined) {
+            args = internals.isWin ? ['-d', host] : ['-q', 1, '-n', host];
+        } else {
+            args = internals.isWin ? ['-h', options.maxhops, '-d', host] : ['-m', options.maxhops, '-q', 1, '-n', host];
+        }
+        
         const traceroute = Child.spawn(command, args);
 
         const hops = [];
