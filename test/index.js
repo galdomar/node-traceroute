@@ -14,8 +14,8 @@ const expect = Code.expect;
 
 describe('Traceroute', () => {
 
-    let testIntenetTIM = '156.54.69.9';
-    let testIntranetTIM = '10.32.125.221';
+    let testInternetTIM = '156.54.69.9';
+    let testIntranetIP = '10.197.9.74';
     let testLocalIP = '127.0.0.1';
     let options = {
         maxhops: 30
@@ -33,23 +33,23 @@ describe('Traceroute', () => {
     });
 
     it('traces a route to internet TIM', (done) => {
-        Traceroute.trace(testIntenetTIM, options, (err, hops) => {
+        Traceroute.trace(testInternetTIM, options, (err, hops) => {
             console.log('TEST->')
             console.log(hops);
             expect(err).to.not.exist();
             expect(hops).to.exist();
-            expect(hops[hops.length - 1][testIntenetTIM]).to.exist();
+            expect(hops[hops.length - 1][testInternetTIM]).to.exist();
             done();
         });
     });
 
-    it('traces a route to intranet TIM', (done) => {
-        Traceroute.trace(testIntranetTIM, options, (err, hops) => {
+    it('traces a route to intranet IP', (done) => {
+        Traceroute.trace(testIntranetIP, options, (err, hops) => {
             console.log('TEST->')
             console.log(hops);
             expect(err).to.not.exist();
             expect(hops).to.exist();
-            expect(hops[hops.length - 1][testIntranetTIM]).to.exist();
+            expect(hops[hops.length - 1][testIntranetIP]).to.exist();
             done();
         });
     });
