@@ -86,6 +86,7 @@ internals.Traceroute.trace = function (host, options, callback) {
                 console.log('RESULT: ' + result);
                 const hop = internals.parseHop(result);
                 if (hop && (hop !== false)) {
+                    console.log(hop);
                     hops.push(hop);
                     emitter.emit('hop', hop);     
                 }
@@ -154,11 +155,17 @@ internals.parseHopWin = function (line) {
 
 internals.parseHopNix = function (line) {
 
+    let hop = {};
+
     if (line[1] === '0') {
+        hop['Request timed out'] = [+line[1], +line[1], +line[1]];
+       return hop;
+    }
+
+    if (line[0] === 'traceroute') {
         return false;
     }
 
-    const hop = {};
     let lastip = line[1];
 
     hop[line[1]] = [+line[2]];
