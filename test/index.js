@@ -14,41 +14,53 @@ const expect = Code.expect;
 
 describe('Traceroute', () => {
 
-    let testUrl = '10.214.146.1';
+    let testIntenetTIM = '156.54.69.9';
+    let testIntranetTIM = '10.32.125.221';
     let options = {
-        maxhops: 8
+        maxhops: 30
     };
-    it('traces a route to TIM', (done) => {
-        Traceroute.trace(testUrl, options, (err, hops) => {
+    it('traces a route to internet TIM', (done) => {
+        Traceroute.trace(testIntenetTIM, options, (err, hops) => {
             console.log('TEST->')
             console.log(hops);
             expect(err).to.not.exist();
             expect(hops).to.exist();
-            expect(hops[hops.length - 1][testUrl]).to.exist();
+            expect(hops[hops.length - 1][testIntenetTIM]).to.exist();
             done();
         });
     });
 
-    // it('traces a route', (done) => {
+    it('traces a route to intranet TIM', (done) => {
+        Traceroute.trace(testIntranetTIM, options, (err, hops) => {
+            console.log('TEST->')
+            console.log(hops);
+            expect(err).to.not.exist();
+            expect(hops).to.exist();
+            expect(hops[hops.length - 1][testIntranetTIM]).to.exist();
+            done();
+        });
+    });
 
-    //     Traceroute.trace('8.8.8.8', (err, hops) => {
+    it('traces a route to google dns', (done) => {
 
-    //         expect(err).to.not.exist();
-    //         expect(hops).to.exist();
-    //         expect(hops[hops.length - 1]['8.8.8.8']).to.exist();
-    //         done();
-    //     });
-    // });
+        Traceroute.trace('8.8.8.8', null, (err, hops) => {
 
-    // it('streams traceroute results', (done) => {
+            expect(err).to.not.exist();
+            expect(hops).to.exist();
+            expect(hops[hops.length - 1]['8.8.8.8']).to.exist();
+            done();
+        });
+    });
 
-    //     const trace = Traceroute.trace('8.8.8.8');
+    it('streams traceroute results', (done) => {
 
-    //     trace.on('hop', (hop) => {
+        const trace = Traceroute.trace('8.8.8.8');
 
-    //         expect(hop).to.exist();
-    //         trace.removeAllListeners();
-    //         done();
-    //     });
-    // });
+        trace.on('hop', (hop) => {
+
+            expect(hop).to.exist();
+            trace.removeAllListeners();
+            done();
+        });
+    });
 });
