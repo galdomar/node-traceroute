@@ -45,25 +45,51 @@ internals.Traceroute.trace = function (host, options, callback) {
             args = internals.isWin ? ['-h', options.maxhops, '-d', host] : ['-m', options.maxhops, '-q', 1, '-n', host];
         }
         
+        console.log('LAUNCH: ' + command + ' ' + args);
         const traceroute = Child.spawn(command, args);
 
         const hops = [];
         let counter = 0;
+        let lineEmitted = '';
         traceroute.stdout.on('data', (data) => {
 
-            ++counter;
-            if ((!internals.isWin && counter < 1) || (internals.isWin && counter < 5)) {
-                return null;
+            let lines;
+            lineEmitted += data;
+            if (data.indexOf("\n") === -1) {
+               return null;
+            } else {
+                let newLineEmitted = '';
+                let lastSeparator = lineEmitted.lastIndexOf('\n');
+                console.log('lastSeparator: ' + lastSeparator);
+                console.log('lineEmitted.length: ' + lineEmitted.length);
+                if (lastSeparator  !== lineEmitted.length - 1) {
+                    newLineEmitted = lineEmitted.substring(lastSeparator);
+                    lineEmitted = lineEmitted.substring(0, lastSeparator);
+                }
+               //data = lineEmitted; 
+               lines = lineEmitted.split('\n');
+               lineEmitted = newLineEmitted;
             }
-
-            const result = data.toString().replace(/\n$/,'');
-            if (!result) {
-                return null;
-            }
-
-            const hop = internals.parseHop(result);
-            hops.push(hop);
-            emitter.emit('hop', hop);
+            console.log('lineemitted: ', lineEmitted);
+            console.log(lines);
+            lines.forEach(function(element) {
+                ++counter;
+                if ((!internals.isWin && counter < 1) || (internals.isWin && counter < 5)) {
+                    return null;
+                }
+    
+                const result = element.toString().replace(/\n$/,'');
+                if (!result) {
+                    return null;
+                }
+    
+                console.log('RESULT: ' + result);
+                const hop = internals.parseHop(result);
+                if (hop && (hop !== false)) {
+                    hops.push(hop);
+                    emitter.emit('hop', hop);     
+                }
+            }, this);
         });
 
         traceroute.on('close', (code) => {
@@ -82,6 +108,8 @@ internals.Traceroute.trace = function (host, options, callback) {
 
 internals.parseHop = function (hop) {
 
+    console.log('parseHop->');
+    console.log(hop);
     let line = hop.replace(/\*/g,'0');
 
     if (internals.isWin) {
@@ -101,13 +129,25 @@ internals.parseHop = function (hop) {
 
 internals.parseHopWin = function (line) {
 
-    if (line[4] === 'Request') {
+    console.log('parseHopWin->');
+    console.log(line);
+    // if (line[4] === 'Request') {
+    //     return false;
+    // }
+    if (line[0] === '\r') {
+        return false;
+    }    
+    if (line[0] === 'Trace') {
         return false;
     }
-
     const hop = {};
-    hop[line[4]] = [+line[1], +line[2], +line[3]];
+    if ((line[1] === '0') && (line[2] === '0') && (line[3] === '0')) {
+        hop['Request timed out'] = [+line[1], +line[2], +line[3]];
+    } else {
+        hop[String(line[4])] = [+line[1], +line[2], +line[3]];
+    }
 
+    console.log(hop);
     return hop;
 };
 
