@@ -74,7 +74,7 @@ internals.Traceroute.trace = function (host, options, callback) {
             console.log(lines);
             lines.forEach(function(element) {
                 ++counter;
-                if ((!internals.isWin && counter < 1) || (internals.isWin && counter < 5)) {
+                if ((!internals.isWin && counter < 1) || (internals.isWin && counter < 4)) {
                     return null;
                 }
     
