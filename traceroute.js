@@ -41,9 +41,9 @@ internals.Traceroute.trace = function (host, options, callback) {
         const command = (internals.isWin ? 'tracert' : 'traceroute');
         let args;
         if (options.maxhops === undefined) {
-            args = internals.isWin ? ['-d', host] : ['-q', 1, '-n', host];
+            args = internals.isWin ? ['-d', host] : ['-I', '-q', 3, '-n', host];
         } else {
-            args = internals.isWin ? ['-h', options.maxhops, '-d', host] : ['-m', options.maxhops, '-q', 1, '-n', host];
+            args = internals.isWin ? ['-h', options.maxhops, '-d', host] : ['-I', '-m', options.maxhops, '-q', 3, '-n', host];
         }
         
         console.info('LAUNCH: ' + command + ' ' + args);
