@@ -7,7 +7,8 @@ const EventEmitter = require('events');
 const Net = require('net');
 const Os = require('os');
 const Util = require('util');
-
+const console = require('winston');
+console.remove(console.transports.Console);
 
 const internals = {};
 
@@ -45,7 +46,7 @@ internals.Traceroute.trace = function (host, options, callback) {
             args = internals.isWin ? ['-h', options.maxhops, '-d', host] : ['-m', options.maxhops, '-q', 1, '-n', host];
         }
         
-        console.log('LAUNCH: ' + command + ' ' + args);
+        console.info('LAUNCH: ' + command + ' ' + args);
         const traceroute = Child.spawn(command, args);
 
         const hops = [];

@@ -31,5 +31,8 @@
     "trace",
     "route"
   ],
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "winston": "^2.4.0"
+  }
 }
